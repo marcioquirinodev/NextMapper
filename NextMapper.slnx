@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/NextMapper.Abstractions/NextMapper.Abstractions.csproj" Id="367edac4-24bd-404d-b930-d5832f1e84a0" />
+  <Project Path="src/NextMapper.Engine/NextMapper.Engine.csproj" Id="331694bb-a376-4df5-9768-499d70c5cbd4" />
+</Solution>

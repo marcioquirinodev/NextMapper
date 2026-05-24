@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
@@ -72,7 +72,7 @@ namespace NextMapper.Engine
 
                 var explicitMappings = GetExplicitMappings(method);
 
-                foreach (var targetProp in targetType.GetMembers().OfType<IPropertySymbol>().Where(p => !p.IsReadOnly))
+                foreach (var targetProp in GetAllProperties(targetType).Where(p => !p.IsReadOnly))
                 {
                     // Rule 1: Explicit Mappings [MapMember]
                     if (explicitMappings.TryGetValue(targetProp.Name, out var explicitSourceName))
@@ -82,7 +82,7 @@ namespace NextMapper.Engine
                     }
 
                     // Rule 2: Direct Mapping (Matching Names)
-                    var directProp = sourceType.GetMembers().OfType<IPropertySymbol>().FirstOrDefault(p => p.Name == targetProp.Name);
+                    var directProp = GetAllProperties(sourceType).FirstOrDefault(p => p.Name == targetProp.Name);
                     if (directProp != null)
                     {
                         if (directProp.Type.Name == "List" || directProp.Type.TypeKind == TypeKind.Array)
@@ -109,6 +109,30 @@ namespace NextMapper.Engine
             return sb.ToString();
         }
 
+        private static IEnumerable<IPropertySymbol> GetAllProperties(ITypeSymbol type)
+        {
+            var properties = new List<IPropertySymbol>();
+            var names = new HashSet<string>(StringComparer.Ordinal);
+
+            var currentType = type as INamedTypeSymbol;
+            while (currentType != null && currentType.SpecialType != SpecialType.System_Object)
+            {
+                foreach (var member in currentType.GetMembers())
+                {
+                    if (member is IPropertySymbol property)
+                    {
+                        if (names.Add(property.Name))
+                        {
+                            properties.Add(property);
+                        }
+                    }
+                }
+                currentType = currentType.BaseType;
+            }
+
+            return properties;
+        }
+
         private static Dictionary<string, string> GetExplicitMappings(IMethodSymbol method)
         {
             var dic = new Dictionary<string, string>();
@@ -123,7 +147,7 @@ namespace NextMapper.Engine
 
         private static (string ParentObject, string ChildProperty)? FindFlattenedProperty(INamedTypeSymbol sourceType, string targetName)
         {
-            var complexChildren = sourceType.GetMembers().OfType<IPropertySymbol>()
+            var complexChildren = GetAllProperties(sourceType)
                 .Where(p => p.Type.TypeKind == TypeKind.Class && p.Type.SpecialType == SpecialType.None);
 
             foreach (var prop in complexChildren)
@@ -131,7 +155,7 @@ namespace NextMapper.Engine
                 if (targetName.StartsWith(prop.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     var remainder = targetName.Substring(prop.Name.Length);
-                    var subProp = prop.Type.GetMembers().OfType<IPropertySymbol>()
+                    var subProp = GetAllProperties(prop.Type)
                         .FirstOrDefault(p => string.Equals(p.Name, remainder, StringComparison.OrdinalIgnoreCase));
                     if (subProp != null) return (prop.Name, subProp.Name);
                 }

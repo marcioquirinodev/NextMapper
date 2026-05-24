@@ -232,6 +232,6 @@ Sim, absolutamente! Como o código é escrito de forma explícita pelo compilado
 
 📄 Licença
 
-Este projeto é open-source e está licenciado sob a licença MIT — o que significa que você é livre para usar, modificar, distribuir e integrar em qualquer projeto comercial sem restrições ou custos ocultos!
+Este projeto é open-source e está licensed sob a licença MIT — o que significa que você é livre para usar, modificar, distribuir e integrar em qualquer projeto comercial sem restrições ou custos ocultos!
 
 NextMapper — Performance em tempo de compilação para o ecossistema .NET.

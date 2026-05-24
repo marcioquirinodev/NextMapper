@@ -22,5 +22,20 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<None Include="..\..\README.md" Pack="true" PackagePath="\" />	</ItemGroup>
- </Project>
+		<None Include="..\..\README.md" Pack="true" PackagePath="\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\NextMapper.Engine\NextMapper.Engine.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" />
+	</ItemGroup>
+
+	<PropertyGroup>
+		<TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_PackAnalyzers</TargetsForTfmSpecificContentInPackage>
+	</PropertyGroup>
+
+	<Target Name="_PackAnalyzers">
+		<ItemGroup>
+			<TfmSpecificPackageFile Include="..\NextMapper.Engine\bin\$(Configuration)\netstandard2.0\NextMapper.Engine.dll" PackagePath="analyzers/dotnet/cs" />
+		</ItemGroup>
+	</Target>
+</Project>
